@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace code
 {
+    //==========================================================
+    // Student Number	: S10268118
+    // Student Name	: Ryan Wee Wei Yan
+    // Partner Name	: Ong Yong Sheng
+    //==========================================================
+
     public abstract class Flight
     {
         private string _flightNumber;
