@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace code
 {
-    abstract class Flight
+    public abstract class Flight
     {
         private string _flightNumber;
 
