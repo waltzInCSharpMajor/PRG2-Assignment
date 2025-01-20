@@ -7,6 +7,11 @@ using code;
 
 namespace S10268118_PRG2Assignment
 {
+    //==========================================================
+    // Student Number	: S10270550
+    // Student Name	: Ong Yong Sheng
+    // Partner Name	: Ryan Wee Wei Yan
+    //==========================================================
     public class Airline
     {
         private string _airlineCode;
