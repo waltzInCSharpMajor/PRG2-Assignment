@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using code;
+﻿using code;
 
 namespace S10268118_PRG2Assignment
 {
@@ -42,39 +37,43 @@ namespace S10268118_PRG2Assignment
             set { _supportsLWTT = value; }
         }
 
-        private Flight? _assignedFlight;
-        public Flight? AssignedFlight
+        private Flight? _flight;
+        public Flight? Flight
         {
-            get { return _assignedFlight; }
-            set { _assignedFlight = value; }
+            get { return _flight; }
+            set { _flight = value; }
         }
 
-        public BoardingGate(string gateName, bool supportsDDJB, bool supportsCFFT, bool supportsLWTT)
+        public BoardingGate(
+            string gateName,
+            bool supportsDDJB,
+            bool supportsCFFT,
+            bool supportsLWTT
+        )
         {
             GateName = gateName;
             SupportsDDJB = supportsDDJB;
             SupportsCFFT = supportsCFFT;
             SupportsLWTT = supportsLWTT;
-            AssignedFlight = null;
+            Flight = null;
         }
 
-        public bool CanSupportRequest(string? specialRequestCode)
+        public double CalculateFees()
         {
-            if (string.IsNullOrEmpty(specialRequestCode)) return true;
-
-            return specialRequestCode switch
+            if (Flight == null)
             {
-                "DDJB" => SupportsDDJB,
-                "CFFT" => SupportsCFFT,
-                "LWTT" => SupportsLWTT,
-                _ => false
-            };
+                return 0;
+            }
+            else
+            {
+                return Flight.CalculateFees();
+            }
         }
 
         public override string ToString()
         {
-            return $"Gate {GateName} [DDJB:{SupportsDDJB} CFFT:{SupportsCFFT} LWTT:{SupportsLWTT}]" +
-                   $"\nAssigned Flight: {(AssignedFlight != null ? AssignedFlight.FlightNumber : "None")}";
+            return $"Gate {GateName} [DDJB:{SupportsDDJB} CFFT:{SupportsCFFT} LWTT:{SupportsLWTT}]"
+                + $"\nAssigned Flight: {(Flight != null ? Flight.FlightNumber : "None")}";
         }
     }
 }

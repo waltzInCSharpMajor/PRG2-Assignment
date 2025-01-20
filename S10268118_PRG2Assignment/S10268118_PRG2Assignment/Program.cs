@@ -121,24 +121,56 @@ namespace code
                         switch (specialRequestCode)
                         {
                             case "CFFT":
-                                flight = new CFFTFlight(parts[0], parts[1], parts[2],
-                                    DateTime.ParseExact(parts[3], "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture),
-                                    "Scheduled");
+                                flight = new CFFTFlight(
+                                    parts[0],
+                                    parts[1],
+                                    parts[2],
+                                    DateTime.ParseExact(
+                                        parts[3],
+                                        "dd/MM/yyyy HH:mm",
+                                        CultureInfo.InvariantCulture
+                                    ),
+                                    "Scheduled"
+                                );
                                 break;
                             case "LWTT":
-                                flight = new LWTTFlight(parts[0], parts[1], parts[2],
-                                    DateTime.ParseExact(parts[3], "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture),
-                                    "Scheduled");
+                                flight = new LWTTFlight(
+                                    parts[0],
+                                    parts[1],
+                                    parts[2],
+                                    DateTime.ParseExact(
+                                        parts[3],
+                                        "dd/MM/yyyy HH:mm",
+                                        CultureInfo.InvariantCulture
+                                    ),
+                                    "Scheduled"
+                                );
                                 break;
                             case "DDJB":
-                                flight = new DDJBFlight(parts[0], parts[1], parts[2],
-                                    DateTime.ParseExact(parts[3], "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture),
-                                    "Scheduled");
+                                flight = new DDJBFlight(
+                                    parts[0],
+                                    parts[1],
+                                    parts[2],
+                                    DateTime.ParseExact(
+                                        parts[3],
+                                        "dd/MM/yyyy HH:mm",
+                                        CultureInfo.InvariantCulture
+                                    ),
+                                    "Scheduled"
+                                );
                                 break;
                             default:
-                                flight = new NORMFlight(parts[0], parts[1], parts[2],
-                                    DateTime.ParseExact(parts[3], "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture),
-                                    "Scheduled");
+                                flight = new NORMFlight(
+                                    parts[0],
+                                    parts[1],
+                                    parts[2],
+                                    DateTime.ParseExact(
+                                        parts[3],
+                                        "dd/MM/yyyy HH:mm",
+                                        CultureInfo.InvariantCulture
+                                    ),
+                                    "Scheduled"
+                                );
                                 break;
                         }
 
