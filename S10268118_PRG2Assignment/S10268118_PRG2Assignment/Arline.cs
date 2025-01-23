@@ -28,33 +28,19 @@ namespace S10268118_PRG2Assignment
             set { _airlineName = value; }
         }
 
-        private List<Flight> _flights;
-        public List<Flight> Flights
+        private List<Flight> _flights = new();
+        public IReadOnlyList<Flight> Flights => _flights.AsReadOnly();
+
+        public Airline(string code, string name)
         {
-            get { return _flights; }
-            set { _flights = value; }
+            AirlineCode = code;
+            AirlineName = name;
         }
 
-        public Airline(string airlineCode, string airlineName)
-        {
-            AirlineCode = airlineCode;
-            AirlineName = airlineName;
-            Flights = new List<Flight>();
-        }
+        public void AddFlight(Flight flight) => _flights.Add(flight);
 
-        public void AddFlight(Flight flight)
-        {
-            Flights.Add(flight);
-        }
+        public void RemoveFlight(Flight flight) => _flights.Remove(flight);
 
-        public void RemoveFlight(Flight flight)
-        {
-            Flights.Remove(flight);
-        }
-
-        public override string ToString()
-        {
-            return $"{AirlineCode} - {AirlineName}";
-        }
+        public override string ToString() => $"{AirlineCode} - {AirlineName}";
     }
 }
