@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using S10268118_PRG2Assignment;
 
 namespace code
 {
     //==========================================================
-    // Student Number	: S10268118
-    // Student Name	: Ryan Wee Wei Yan
-    // Partner Name	: Ong Yong Sheng
+    // Student Number : S10268118
+    // Student Name : Ryan Wee Wei Yan
+    // Partner Name : Ong Yong Sheng
     //==========================================================
     public class Terminal
     {
@@ -21,13 +22,13 @@ namespace code
             set { _terminalName = value; }
         }
 
-        //private Dictionary<string, Airline> _airlines;
+        private Dictionary<string, Airline> _airlines;
 
-        //public Dictionary<string, Airline> Airlines
-        //{
-        //    get { return _airlines; }
-        //    set { _airlines = value; }
-        //}
+        public Dictionary<string, Airline> Airlines
+        {
+            get { return _airlines; }
+            set { _airlines = value; }
+        }
 
         private Dictionary<string, Flight> _flights;
 
@@ -37,13 +38,13 @@ namespace code
             set { _flights = value; }
         }
 
-        //private Dictionary<string, BoardingGate> _boardingGates;
+        private Dictionary<string, BoardingGate> _boardingGates;
 
-        //public Dictionary<string, BoardingGate> BoardingGates
-        //{
-        //    get { return _boardingGates; }
-        //    set { _boardingGates = value; }
-        //}
+        public Dictionary<string, BoardingGate> BoardingGates
+        {
+            get { return _boardingGates; }
+            set { _boardingGates = value; }
+        }
 
         private Dictionary<string, double> _gateFees;
 
@@ -53,6 +54,30 @@ namespace code
             set { _gateFees = value; }
         }
 
+        public bool AddAirline(Airline airline)
+        {
+            return Airlines.TryAdd(airline.Code, airline);
+        }
 
+        public bool AddBoardingGate(BoardingGate boardingGate)
+        {
+            return BoardingGates.TryAdd(boardingGate.GateName, boardingGate);
+        }
+
+        public Airline GetAirlineFromFlight(Flight flight)
+        {
+            return Airlines[flight.FlightNumber[..2]];
+        }
+
+        ////TODO
+        //public void PrintAirlineFees
+        //{
+
+        //}
+
+        public override string ToString()
+        {
+            return TerminalName;
+        }
     }
 }

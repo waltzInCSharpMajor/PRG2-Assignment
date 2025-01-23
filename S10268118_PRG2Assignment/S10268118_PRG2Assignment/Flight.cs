@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace code
 {
     //==========================================================
-    // Student Number	: S10268118
-    // Student Name	: Ryan Wee Wei Yan
-    // Partner Name	: Ong Yong Sheng
+    // Student Number : S10268118
+    // Student Name : Ryan Wee Wei Yan
+    // Partner Name : Ong Yong Sheng
     //==========================================================
 
     public abstract class Flight
@@ -61,7 +61,13 @@ namespace code
             return $"Flight Number {FlightNumber} from {Origin} to {Destination}\nExpected Time: {ExpectedTime}\nStatus: {Status}";
         }
 
-        public Flight(string flightNumber, string origin, string destination, DateTime expectedTime, string status)
+        public Flight(
+            string flightNumber,
+            string origin,
+            string destination,
+            DateTime expectedTime,
+            string status
+        )
         {
             FlightNumber = flightNumber;
             Origin = origin;

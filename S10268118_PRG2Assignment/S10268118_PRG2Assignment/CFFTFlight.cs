@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using code;
 
 namespace S10268118_PRG2Assignment
 {
@@ -11,19 +12,35 @@ namespace S10268118_PRG2Assignment
     // Student Name	: Ong Yong Sheng
     // Partner Name	: Ryan Wee Wei Yan
     //==========================================================
-    public class CFFTFlight : NORMFlight
+    public class CFFTFlight : Flight
     {
         private const double requestFee = 150; // CFFT Code Request Fee
 
-        public CFFTFlight(string flightNumber, string origin, string destination,
-                         DateTime expectedTime, string status = "Scheduled")
-            : base(flightNumber, origin, destination, expectedTime, status)
-        {
-        }
+        public CFFTFlight(
+            string flightNumber,
+            string origin,
+            string destination,
+            DateTime expectedTime,
+            string status = "Scheduled"
+        )
+            : base(flightNumber, origin, destination, expectedTime, status) { }
 
         public override double CalculateFees()
         {
-            return base.CalculateFees() + requestFee;
+            double fees = 300; //Boarding Gate Base Fee
+
+            if (Destination == "Singapore (SIN)")
+            {
+                fees += 500; // Arriving Flight Fee
+            }
+            else if (Origin == "Singapore (SIN)")
+            {
+                fees += 800; // Departing Flight Fee
+            }
+
+            fees += requestFee; //Request Fee
+
+            return fees;
         }
     }
 }

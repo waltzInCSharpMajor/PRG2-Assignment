@@ -14,25 +14,24 @@ namespace S10268118_PRG2Assignment
     //==========================================================
     public class NORMFlight : Flight
     {
-        public NORMFlight(string flightNumber, string origin, string destination,
-                         DateTime expectedTime, string status = "Scheduled")
-            : base(flightNumber, origin, destination, expectedTime, status)
-        {
-        }
+        public NORMFlight(
+            string flightNumber,
+            string origin,
+            string destination,
+            DateTime expectedTime,
+            string status = "Scheduled"
+        )
+            : base(flightNumber, origin, destination, expectedTime, status) { }
 
         public override double CalculateFees()
         {
-            double fees = 0;
+            double fees = 300; //Boarding Gate Base Fee
 
-            // Base boarding gate fee
-            fees += 300; // Boarding Gate Base Fee
-
-            // Flight fees based on direction
-            if (Destination.Contains("SIN"))
+            if (Destination == "Singapore (SIN)")
             {
                 fees += 500; // Arriving Flight Fee
             }
-            else if (Origin.Contains("SIN"))
+            else if (Origin == "Singapore (SIN)")
             {
                 fees += 800; // Departing Flight Fee
             }
