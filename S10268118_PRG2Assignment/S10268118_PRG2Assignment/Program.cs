@@ -1,206 +1,175 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using code;
 using S10268118_PRG2Assignment;
 
-namespace code
+void LoadAirlines(Dictionary<string, Airline> airlines)
 {
-    class Program
+    try
     {
-        private static Dictionary<string, Airline> airlines = new();
-        private static Dictionary<string, BoardingGate> boardingGates = new();
-        private static Dictionary<string, Flight> flights = new();
-
-        static void Main(string[] args)
+        string[] lines = File.ReadAllLines("airlines.csv").Skip(1).ToArray();
+        foreach (string line in lines)
         {
-            Console.WriteLine("Loading Airlines...");
-            LoadAirlines();
-            Console.WriteLine($"{airlines.Count} Airlines Loaded!\n");
-
-            Console.WriteLine("Loading Boarding Gates...");
-            LoadBoardingGates();
-            Console.WriteLine($"{boardingGates.Count} Boarding Gates Loaded!\n");
-
-            Console.WriteLine("Loading Flights...");
-            LoadFlights();
-            Console.WriteLine($"{flights.Count} Flights Loaded!\n");
-
-            while (true)
-            {
-                DisplayMenu();
-                string? choice = Console.ReadLine();
-
-                switch (choice)
-                {
-                    case "1":
-                        ListAllFlights();
-                        break;
-                    case "2":
-                        ListBoardingGates();
-                        break;
-                    case "3":
-                        AssignBoardingGate();
-                        break;
-                    case "4":
-                        CreateFlight();
-                        break;
-                    case "5":
-                        DisplayAirlineFlights();
-                        break;
-                    case "6":
-                        ModifyFlightDetails();
-                        break;
-                    case "7":
-                        DisplayFlightSchedule();
-                        break;
-                    case "0":
-                        Console.WriteLine("Goodbye!");
-                        return;
-                    default:
-                        Console.WriteLine("Invalid option! Please try again.");
-                        break;
-                }
-            }
+            string[] parts = line.Split(',');
+            airlines[parts[1]] = new Airline(parts[1], parts[0]);
         }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error loading airlines: {ex.Message}");
+    }
+}
 
-        static void LoadAirlines()
+void LoadBoardingGates(Dictionary<string, BoardingGate> boardingGates)
+{
+    try
+    {
+        string[] lines = File.ReadAllLines("boardinggates.csv").Skip(1).ToArray();
+        foreach (string line in lines)
         {
-            try
-            {
-                string[] lines = File.ReadAllLines("airlines.csv").Skip(1).ToArray();
-                foreach (string line in lines)
-                {
-                    string[] parts = line.Split(',');
-                    airlines[parts[1]] = new Airline(parts[1], parts[0]);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading airlines: {ex.Message}");
-            }
+            string[] parts = line.Split(',');
+            boardingGates[parts[0]] = new BoardingGate(
+                parts[0],
+                bool.Parse(parts[1]),
+                bool.Parse(parts[2]),
+                bool.Parse(parts[3])
+            );
         }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error loading boarding gates: {ex.Message}");
+    }
+}
 
-        static void LoadBoardingGates()
+void LoadFlights(Dictionary<string, Flight> flights, Dictionary<string, Airline> airlines)
+{
+    try
+    {
+        string[] lines = File.ReadAllLines("flights.csv").Skip(1).ToArray();
+        foreach (string line in lines)
         {
-            try
+            string[] parts = line.Split(',');
+            string[] flightParts = parts[0].Split(' ');
+
+            if (airlines.TryGetValue(flightParts[0], out Airline? airline))
             {
-                string[] lines = File.ReadAllLines("boardinggates.csv").Skip(1).ToArray();
-                foreach (string line in lines)
+                string specialRequestCode = parts.Length > 4 ? parts[4].Trim() : "";
+                DateTime timeOnly = DateTime.ParseExact(parts[3], "h:mm tt", CultureInfo.InvariantCulture);
+                DateTime expectedTime = DateTime.Today.Add(timeOnly.TimeOfDay);
+
+                // Create appropriate flight type based on special request code
+                Flight flight = specialRequestCode switch
                 {
-                    string[] parts = line.Split(',');
-                    boardingGates[parts[0]] = new BoardingGate(
+                    "CFFT" => new CFFTFlight(
                         parts[0],
-                        bool.Parse(parts[1]),
-                        bool.Parse(parts[2]),
-                        bool.Parse(parts[3])
-                    );
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading boarding gates: {ex.Message}");
-            }
-        }
-
-        static void LoadFlights()
-        {
-            try
-            {
-                string[] lines = File.ReadAllLines("flights.csv").Skip(1).ToArray();
-                foreach (string line in lines)
-                {
-                    string[] parts = line.Split(',');
-                    string[] flightParts = parts[0].Split(' ');
-
-                    if (airlines.TryGetValue(flightParts[0], out Airline? airline))
-                    {
-                        // Create appropriate flight type based on special request code
-                        Flight flight;
-                        string specialRequestCode = parts.Length > 4 ? parts[4].Trim() : "";
-
-                        switch (specialRequestCode)
-                        {
-                            case "CFFT":
-                                flight = new CFFTFlight(
-                                    parts[0],
-                                    parts[1],
-                                    parts[2],
-                                    DateTime.ParseExact(
-                                        parts[3],
-                                        "dd/MM/yyyy HH:mm",
-                                        CultureInfo.InvariantCulture
-                                    ),
-                                    "Scheduled"
-                                );
-                                break;
-                            case "LWTT":
-                                flight = new LWTTFlight(
-                                    parts[0],
-                                    parts[1],
-                                    parts[2],
-                                    DateTime.ParseExact(
-                                        parts[3],
-                                        "dd/MM/yyyy HH:mm",
-                                        CultureInfo.InvariantCulture
-                                    ),
-                                    "Scheduled"
-                                );
-                                break;
-                            case "DDJB":
-                                flight = new DDJBFlight(
-                                    parts[0],
-                                    parts[1],
-                                    parts[2],
-                                    DateTime.ParseExact(
-                                        parts[3],
-                                        "dd/MM/yyyy HH:mm",
-                                        CultureInfo.InvariantCulture
-                                    ),
-                                    "Scheduled"
-                                );
-                                break;
-                            default:
-                                flight = new NORMFlight(
-                                    parts[0],
-                                    parts[1],
-                                    parts[2],
-                                    DateTime.ParseExact(
-                                        parts[3],
-                                        "dd/MM/yyyy HH:mm",
-                                        CultureInfo.InvariantCulture
-                                    ),
-                                    "Scheduled"
-                                );
-                                break;
-                        }
-
-                        flights[parts[0]] = flight;
-                        airline.AddFlight(flight);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading flights: {ex.Message}");
+                        parts[1],
+                        parts[2],
+                        expectedTime,
+                        "Scheduled"
+                    ),
+                    "LWTT" => new LWTTFlight(
+                        parts[0],
+                        parts[1],
+                        parts[2],
+                        expectedTime,
+                        "Scheduled"
+                    ),
+                    "DDJB" => new DDJBFlight(
+                        parts[0],
+                        parts[1],
+                        parts[2],
+                        expectedTime,
+                        "Scheduled"
+                    ),
+                    _ => new NORMFlight(
+                        parts[0],
+                        parts[1],
+                        parts[2],
+                        expectedTime,
+                        "Scheduled"
+                    ),
+                };
+                flights[parts[0]] = flight;
+                airline.AddFlight(flight);
             }
         }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error loading flights: {ex.Message}");
+    }
+}
 
-        static void DisplayMenu()
-        {
-            Console.WriteLine("=============================================");
-            Console.WriteLine("Welcome to Changi Airport Terminal 5");
-            Console.WriteLine("=============================================");
-            Console.WriteLine("1. List All Flights");
-            Console.WriteLine("2. List Boarding Gates");
-            Console.WriteLine("3. Assign a Boarding Gate to a Flight");
-            Console.WriteLine("4. Create Flight");
-            Console.WriteLine("5. Display Airline Flights");
-            Console.WriteLine("6. Modify Flight Details");
-            Console.WriteLine("7. Display Flight Schedule");
-            Console.WriteLine("0. Exit");
-            Console.WriteLine("Please select your option:");
-        }
+void DisplayMenu()
+{
+    Console.WriteLine(
+        @"=============================================
+Welcome to Changi Airport Terminal 5
+=============================================
+1. List All Flights
+2. List Boarding Gates
+3. Assign a Boarding Gate to a Flight
+4. Create Flight
+5. Display Airline Flights
+6. Modify Flight Details
+7. Display Flight Schedule
+0. Exit
 
-        // Menu option methods would be implemented here based on the assignment of features to team members
+Please select your option:"
+    );
+}
+
+Dictionary<string, Airline> airlines = [];
+Dictionary<string, BoardingGate> boardingGates = [];
+Dictionary<string, Flight> flights = [];
+
+Console.WriteLine("Loading Airlines...");
+LoadAirlines(airlines);
+Console.WriteLine($"{airlines.Count} Airlines Loaded!\n");
+
+Console.WriteLine("Loading Boarding Gates...");
+LoadBoardingGates(boardingGates);
+Console.WriteLine($"{boardingGates.Count} Boarding Gates Loaded!\n");
+
+Console.WriteLine("Loading Flights...");
+LoadFlights(flights, airlines);
+Console.WriteLine($"{flights.Count} Flights Loaded!\n");
+
+while (true)
+{
+    DisplayMenu();
+    string? choice = Console.ReadLine();
+
+    switch (choice)
+    {
+        case "1":
+            //ListAllFlights();
+            break;
+        case "2":
+            //ListBoardingGates();
+            break;
+        case "3":
+            //AssignBoardingGate();
+            break;
+        case "4":
+            //CreateFlight();
+            break;
+        case "5":
+            //DisplayAirlineFlights();
+            break;
+        case "6":
+            //ModifyFlightDetails();
+            break;
+        case "7":
+            //DisplayFlightSchedule();
+            break;
+        case "0":
+            Console.WriteLine("Goodbye!");
+            return;
+        default:
+            Console.WriteLine("Invalid option! Please try again.");
+            break;
     }
 }

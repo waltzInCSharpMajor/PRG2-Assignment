@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using S10268118_PRG2Assignment;
+using code;
 
-namespace code
+namespace S10268118_PRG2Assignment
 {
     //==========================================================
     // Student Number : S10268118

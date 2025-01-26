@@ -35,13 +35,6 @@ namespace S10268118_PRG2Assignment
             set { _flights = value; }
         }
 
-        public Airline(string airlineCode, string airlineName)
-        {
-            Code = airlineCode;
-            Name = airlineName;
-            Flights = new Dictionary<string, Flight>();
-        }
-
         public bool AddFlight(Flight flight)
         {
             return Flights.TryAdd(flight.FlightNumber, flight);
@@ -72,7 +65,11 @@ namespace S10268118_PRG2Assignment
                     fees -= 110; //For each flight arriving/departing before 11am or after 9pm
                 }
 
-                if (flight.Origin == "Dubai (DXB)" || flight.Origin == "Bangkok (BKK)" || flight.Origin == "Tokyo (NRT)")
+                if (
+                    flight.Origin == "Dubai (DXB)"
+                    || flight.Origin == "Bangkok (BKK)"
+                    || flight.Origin == "Tokyo (NRT)"
+                )
                 {
                     fees -= 25; //For each flight with the Origin of Dubai (DXB), Bangkok (BKK) or Tokyo (NRT)
                 }
@@ -94,6 +91,13 @@ namespace S10268118_PRG2Assignment
         public override string ToString()
         {
             return $"{Code} - {Name}";
+        }
+
+        public Airline(string airlineCode, string airlineName)
+        {
+            Code = airlineCode;
+            Name = airlineName;
+            Flights = [];
         }
     }
 }
