@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Globalization;
 using code;
 using S10268118_PRG2Assignment;
@@ -142,8 +143,65 @@ void ListAllFlights(Dictionary<string, Flight> flights, Dictionary<string, Airli
             flight.ExpectedTime
         );
     }
+}
 
-    Console.WriteLine("\n\n\n\n");
+void CreateFlight(ref Dictionary<string, Flight> flights)
+{
+    while (true)
+    {
+        Console.Write("Enter Flight Number: ");
+        string newFlightNumber = Console.ReadLine();
+
+        Console.Write("Enter Origin: ");
+        string newFlightOrigin = Console.ReadLine();
+
+        Console.Write("Enter Destination: ");
+        string newFlightDestination = Console.ReadLine();
+
+        Console.Write("Enter Expected Departure/Arrival Time (dd/mm/yyyy hh:mm): ");
+        string newFlightExpectedTimeString = Console.ReadLine();
+
+        Console.Write("Enter Special Request Code (CFFT/DDJB/LWTT/None): ");
+        string newFlightSpecialRequestCode = Console.ReadLine();
+
+        try
+        {
+            DateTime newFlightExpectedTime = DateTime.Parse(newFlightExpectedTimeString);
+            if (newFlightSpecialRequestCode == "CFFT")
+            {
+                flights.Add(newFlightNumber, new CFFTFlight(newFlightNumber, newFlightOrigin, newFlightDestination, newFlightExpectedTime));
+            }
+            else if (newFlightSpecialRequestCode == "DDJB")
+            {
+                flights.Add(newFlightNumber, new DDJBFlight(newFlightNumber, newFlightOrigin, newFlightDestination, newFlightExpectedTime));
+            }
+            else if (newFlightSpecialRequestCode == "LWTT")
+            {
+                flights.Add(newFlightNumber, new LWTTFlight(newFlightNumber, newFlightOrigin, newFlightDestination, newFlightExpectedTime));
+            }
+            else if (newFlightSpecialRequestCode == "None")
+            {
+                flights.Add(newFlightNumber, new NORMFlight(newFlightNumber, newFlightOrigin, newFlightDestination, newFlightExpectedTime));
+            }
+            else
+            {
+                throw new FormatException("Special Request Code is invalid.");
+            }
+
+            Console.WriteLine($"Flight {newFlightNumber} has been added!");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error: {e.Message}\nNo flight has been added.");
+        }
+
+        Console.WriteLine("Would you like to add another flight? (\"N\" to stop, else will continue)");
+
+        if (Console.ReadLine() == "N")
+        {
+            break;
+        }
+    }
 }
 
 Dictionary<string, Airline> airlines = [];
@@ -183,10 +241,15 @@ List of Flights for Changi Airport Terminal 5
             //ListBoardingGates();
             break;
         case "3":
+            Console.WriteLine(
+                @"=============================================
+Assign a Boarding Gate to a Flight
+============================================="
+            );
             //AssignBoardingGate();
             break;
         case "4":
-            //CreateFlight();
+            CreateFlight(ref flights);
             break;
         case "5":
             //DisplayAirlineFlights();
@@ -204,4 +267,6 @@ List of Flights for Changi Airport Terminal 5
             Console.WriteLine("Invalid option! Please try again.");
             break;
     }
+
+    Console.WriteLine("\n\n\n\n");
 }
