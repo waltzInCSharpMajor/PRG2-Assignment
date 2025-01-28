@@ -4,6 +4,25 @@ using System.Globalization;
 using code;
 using S10268118_PRG2Assignment;
 
+void DisplayMenu()
+{
+    Console.WriteLine(
+        @"=============================================
+Welcome to Changi Airport Terminal 5
+=============================================
+1. List All Flights
+2. List Boarding Gates
+3. Assign a Boarding Gate to a Flight
+4. Create Flight
+5. Display Airline Flights
+6. Modify Flight Details
+7. Display Flight Schedule
+0. Exit
+
+Please select your option:"
+    );
+}
+
 void LoadAirlines(Dictionary<string, Airline> airlines)
 {
     try
@@ -56,7 +75,11 @@ void LoadFlights(Dictionary<string, Flight> flights, Dictionary<string, Airline>
             if (airlines.TryGetValue(flightParts[0], out Airline? airline))
             {
                 string specialRequestCode = parts.Length > 4 ? parts[4].Trim() : "";
-                DateTime timeOnly = DateTime.ParseExact(parts[3], "h:mm tt", CultureInfo.InvariantCulture);
+                DateTime timeOnly = DateTime.ParseExact(
+                    parts[3],
+                    "h:mm tt",
+                    CultureInfo.InvariantCulture
+                );
                 DateTime expectedTime = DateTime.Today.Add(timeOnly.TimeOfDay);
 
                 // Create appropriate flight type based on special request code
@@ -83,13 +106,7 @@ void LoadFlights(Dictionary<string, Flight> flights, Dictionary<string, Airline>
                         expectedTime,
                         "Scheduled"
                     ),
-                    _ => new NORMFlight(
-                        parts[0],
-                        parts[1],
-                        parts[2],
-                        expectedTime,
-                        "Scheduled"
-                    ),
+                    _ => new NORMFlight(parts[0], parts[1], parts[2], expectedTime, "Scheduled"),
                 };
                 flights[parts[0]] = flight;
                 airline.AddFlight(flight);
@@ -102,23 +119,31 @@ void LoadFlights(Dictionary<string, Flight> flights, Dictionary<string, Airline>
     }
 }
 
-void DisplayMenu()
+void ListAllFlights(Dictionary<string, Flight> flights, Dictionary<string, Airline> airlines)
 {
+    string row_format = "{0, -16}{1, -23}{2, -23}{3, -23}{4}";
     Console.WriteLine(
-        @"=============================================
-Welcome to Changi Airport Terminal 5
-=============================================
-1. List All Flights
-2. List Boarding Gates
-3. Assign a Boarding Gate to a Flight
-4. Create Flight
-5. Display Airline Flights
-6. Modify Flight Details
-7. Display Flight Schedule
-0. Exit
-
-Please select your option:"
+        row_format,
+        "Flight Number",
+        "Airline Name",
+        "Origin",
+        "Destination",
+        "Expected Departure/Arrival Time"
     );
+
+    foreach (Flight flight in flights.Values)
+    {
+        Console.WriteLine(
+            row_format,
+            flight.FlightNumber,
+            airlines[flight.FlightNumber[..2]].Name,
+            flight.Origin,
+            flight.Destination,
+            flight.ExpectedTime
+        );
+    }
+
+    Console.WriteLine("\n\n\n\n");
 }
 
 Dictionary<string, Airline> airlines = [];
@@ -137,6 +162,8 @@ Console.WriteLine("Loading Flights...");
 LoadFlights(flights, airlines);
 Console.WriteLine($"{flights.Count} Flights Loaded!\n");
 
+Console.WriteLine("\n\n\n");
+
 while (true)
 {
     DisplayMenu();
@@ -145,7 +172,12 @@ while (true)
     switch (choice)
     {
         case "1":
-            //ListAllFlights();
+            Console.WriteLine(
+                @"=============================================
+List of Flights for Changi Airport Terminal 5
+============================================="
+            );
+            ListAllFlights(flights, airlines);
             break;
         case "2":
             //ListBoardingGates();
