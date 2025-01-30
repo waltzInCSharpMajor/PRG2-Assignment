@@ -1,6 +1,4 @@
-﻿using code;
-
-namespace S10268118_PRG2Assignment
+﻿namespace S10268118_PRG2Assignment
 {
     //==========================================================
     // Student Number	: S10270550

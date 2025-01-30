@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Globalization;
-using System.Runtime.InteropServices;
-using code;
 using S10268118_PRG2Assignment;
 
 void DisplayMenu()
@@ -138,11 +136,160 @@ void ListAllFlights(Dictionary<string, Flight> flights, Dictionary<string, Airli
         Console.WriteLine(
             row_format,
             flight.FlightNumber,
-            airlines[flight.FlightNumber[..2]].Name,
+            flight.FlightNumber.Length >= 2 && airlines.ContainsKey(flight.FlightNumber[..2]) ? airlines[flight.FlightNumber[..2]].Name : "Unknown",
             flight.Origin,
             flight.Destination,
             flight.ExpectedTime
         );
+    }
+}
+
+void AssignBoardingGate(
+    Dictionary<string, Flight> flights,
+    Dictionary<string, BoardingGate> boardingGates
+)
+{
+    while (true)
+    {
+        Console.WriteLine("Enter Flight Number (or \"Cancel\" to stop): ");
+        string assigningFlightNumber = Console.ReadLine();
+
+        if (flights.TryGetValue(assigningFlightNumber, out Flight? assigningFlight))
+        {
+            Console.WriteLine(
+                @$"Flight Number: {assigningFlightNumber}
+Origin: {assigningFlight.Origin}
+Destination: {assigningFlight.Destination}
+Expected Time: {assigningFlight.ExpectedTime}"
+            );
+            if (assigningFlight is DDJBFlight)
+            {
+                Console.WriteLine("Special Request Code: DDJB");
+            }
+            else if (assigningFlight is CFFTFlight)
+            {
+                Console.WriteLine("Special Request Code: CFFT");
+            }
+            else if (assigningFlight is LWTTFlight)
+            {
+                Console.WriteLine("Special Request Code: LWTT");
+            }
+            else
+            {
+                Console.WriteLine("Special Request Code: None");
+            }
+
+            while (true)
+            {
+                Console.WriteLine("Enter Boarding Gate Name (or \"Cancel\" to stop):");
+                string assigningBoardingGateName = Console.ReadLine();
+
+                if (
+                    boardingGates.TryGetValue(
+                        assigningBoardingGateName,
+                        out BoardingGate? assigningBoardingGate
+                    )
+                )
+                {
+                    Console.WriteLine(
+                        @$"Boarding Gate Name: {assigningBoardingGateName}
+Supports DDJB: {assigningBoardingGate.SupportsDDJB}
+Supports CFFT: {assigningBoardingGate.SupportsCFFT}
+Supports LWTT: {assigningBoardingGate.SupportsLWTT}"
+                    );
+
+                    if (assigningBoardingGate.Flight != null)
+                    {
+                        Console.WriteLine(
+                            $"Flight {assigningBoardingGate.Flight.FlightNumber} is already assigned to Boarding Gate {assigningBoardingGateName}!\nPlease choose another boarding gate.\n"
+                        );
+                        continue;
+                    }
+                    else if (assigningFlight is NORMFlight
+                        || (assigningFlight is DDJBFlight && assigningBoardingGate.SupportsDDJB)
+                        || (assigningFlight is CFFTFlight && assigningBoardingGate.SupportsCFFT)
+                        || (assigningFlight is LWTTFlight && assigningBoardingGate.SupportsLWTT)
+
+                    )
+                    {
+                        while (true)
+                        {
+                            Console.WriteLine(
+                                "Would you like to update the status of the flight? (Y/N)"
+                            );
+                            string updateStatus = Console.ReadLine();
+                            if (updateStatus.Equals("Y", StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                Console.WriteLine(
+                                    @"1. Delayed
+2. Boarding
+3. On Time
+(Anything else). Don't Update Status"
+                                );
+                                string newStatus = Console.ReadLine();
+
+                                if (newStatus == "1")
+                                {
+                                    assigningFlight.Status = "Delayed";
+                                }
+                                else if (newStatus == "2")
+                                {
+                                    assigningFlight.Status = "Boarding";
+                                }
+                                else if (newStatus == "3")
+                                {
+                                    assigningFlight.Status = "On Time";
+                                }
+
+                                break;
+                            }
+                            else if (
+                                updateStatus.Equals("N", StringComparison.CurrentCultureIgnoreCase)
+                            )
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Invalid input! Please enter 'Y' or 'N'.");
+                            }
+                        }
+                        assigningBoardingGate.Flight = assigningFlight;
+                        Console.WriteLine($"Flight {assigningFlightNumber} has been assigned to Boarding Gate {assigningBoardingGateName}!\n");
+                        break;
+                    }
+
+                    else
+                    {
+                        Console.WriteLine(
+                            $"Boarding Gate {assigningBoardingGateName} does not support this flight!\nPlease choose another boarding gate.\n"
+                        );
+                        continue;
+                    }
+                }
+                else if (assigningBoardingGateName.Equals("Cancel", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    Console.WriteLine("Cancelling...\n");
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("No boarding gate with that name was found!\nPlease enter a valid name.\n");
+                }
+            }
+        }
+        else if (assigningFlightNumber.Equals("Cancel", StringComparison.CurrentCultureIgnoreCase))
+        {
+            Console.WriteLine("Cancelling...");
+            break;
+        }
+        else
+        {
+            Console.WriteLine(
+                "No flight with that flight number was found!\nPlease enter a valid flight number.\n"
+            );
+            continue;
+        }
     }
 }
 
@@ -220,19 +367,17 @@ void CreateFlight(ref Dictionary<string, Flight> flights)
 
             try
             {
-                using (StreamWriter sw = new("flights.csv", true))
-                {
-                    sw.WriteLine(
-                        String.Join(
-                            ",",
-                            newFlightNumber,
-                            newFlightOrigin,
-                            newFlightDestination,
-                            newFlightExpectedTimeString,
-                            newFlightSpecialRequestCode == "None" ? "" : newFlightSpecialRequestCode
-                        )
-                    );
-                }
+                using StreamWriter sw = new("flights.csv", true);
+                sw.WriteLine(
+                    String.Join(
+                        ",",
+                        newFlightNumber,
+                        newFlightOrigin,
+                        newFlightDestination,
+                        newFlightExpectedTimeString,
+                        newFlightSpecialRequestCode == "None" ? "" : newFlightSpecialRequestCode
+                    )
+                );
             }
             catch
             {
@@ -300,7 +445,7 @@ List of Flights for Changi Airport Terminal 5
 Assign a Boarding Gate to a Flight
 ============================================="
             );
-            //AssignBoardingGate();
+            AssignBoardingGate(flights, boardingGates);
             break;
         case "4":
             CreateFlight(ref flights);

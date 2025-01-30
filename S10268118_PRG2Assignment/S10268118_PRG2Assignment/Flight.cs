@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace code
+namespace S10268118_PRG2Assignment
 {
     //==========================================================
     // Student Number : S10268118
@@ -58,7 +58,7 @@ namespace code
 
         public override string ToString()
         {
-            return $"Flight Number {FlightNumber} from {Origin} to {Destination}\nExpected Time: {ExpectedTime}\nStatus: {Status}";
+            return $"Flight Number {FlightNumber}\nOrigin: {Origin}\nDestination: {Destination}\nExpected Time: {ExpectedTime}\nStatus: {Status}";
         }
 
         public Flight(
