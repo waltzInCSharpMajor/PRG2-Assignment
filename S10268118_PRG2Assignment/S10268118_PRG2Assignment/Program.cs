@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using code;
 using S10268118_PRG2Assignment;
 
@@ -167,25 +168,76 @@ void CreateFlight(ref Dictionary<string, Flight> flights)
         try
         {
             DateTime newFlightExpectedTime = DateTime.Parse(newFlightExpectedTimeString);
-            if (newFlightSpecialRequestCode == "CFFT")
+            switch (newFlightSpecialRequestCode)
             {
-                flights.Add(newFlightNumber, new CFFTFlight(newFlightNumber, newFlightOrigin, newFlightDestination, newFlightExpectedTime));
+                case "CFFT":
+                    flights.Add(
+                        newFlightNumber,
+                        new CFFTFlight(
+                            newFlightNumber,
+                            newFlightOrigin,
+                            newFlightDestination,
+                            newFlightExpectedTime
+                        )
+                    );
+                    break;
+                case "DDJB":
+                    flights.Add(
+                        newFlightNumber,
+                        new DDJBFlight(
+                            newFlightNumber,
+                            newFlightOrigin,
+                            newFlightDestination,
+                            newFlightExpectedTime
+                        )
+                    );
+                    break;
+                case "LWTT":
+                    flights.Add(
+                        newFlightNumber,
+                        new LWTTFlight(
+                            newFlightNumber,
+                            newFlightOrigin,
+                            newFlightDestination,
+                            newFlightExpectedTime
+                        )
+                    );
+                    break;
+                case "None":
+                    flights.Add(
+                        newFlightNumber,
+                        new NORMFlight(
+                            newFlightNumber,
+                            newFlightOrigin,
+                            newFlightDestination,
+                            newFlightExpectedTime
+                        )
+                    );
+                    break;
+                default:
+                    throw new FormatException("Special Request Code is invalid.");
             }
-            else if (newFlightSpecialRequestCode == "DDJB")
+
+            try
             {
-                flights.Add(newFlightNumber, new DDJBFlight(newFlightNumber, newFlightOrigin, newFlightDestination, newFlightExpectedTime));
+                using (StreamWriter sw = new("flights.csv", true))
+                {
+                    sw.WriteLine(
+                        String.Join(
+                            ",",
+                            newFlightNumber,
+                            newFlightOrigin,
+                            newFlightDestination,
+                            newFlightExpectedTimeString,
+                            newFlightSpecialRequestCode == "None" ? "" : newFlightSpecialRequestCode
+                        )
+                    );
+                }
             }
-            else if (newFlightSpecialRequestCode == "LWTT")
+            catch
             {
-                flights.Add(newFlightNumber, new LWTTFlight(newFlightNumber, newFlightOrigin, newFlightDestination, newFlightExpectedTime));
-            }
-            else if (newFlightSpecialRequestCode == "None")
-            {
-                flights.Add(newFlightNumber, new NORMFlight(newFlightNumber, newFlightOrigin, newFlightDestination, newFlightExpectedTime));
-            }
-            else
-            {
-                throw new FormatException("Special Request Code is invalid.");
+                flights.Remove(newFlightNumber);
+                throw;
             }
 
             Console.WriteLine($"Flight {newFlightNumber} has been added!");
@@ -195,7 +247,9 @@ void CreateFlight(ref Dictionary<string, Flight> flights)
             Console.WriteLine($"Error: {e.Message}\nNo flight has been added.");
         }
 
-        Console.WriteLine("Would you like to add another flight? (\"N\" to stop, else will continue)");
+        Console.WriteLine(
+            "Would you like to add another flight? (\"N\" to stop, else will continue)"
+        );
 
         if (Console.ReadLine() == "N")
         {
