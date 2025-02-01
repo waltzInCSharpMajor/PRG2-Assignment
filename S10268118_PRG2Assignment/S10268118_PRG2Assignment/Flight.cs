@@ -12,7 +12,7 @@ namespace S10268118_PRG2Assignment
     // Partner Name : Ong Yong Sheng
     //==========================================================
 
-    public abstract class Flight
+    public abstract class Flight : IComparable<Flight>
     {
         private string _flightNumber;
 
@@ -55,6 +55,12 @@ namespace S10268118_PRG2Assignment
         }
 
         public abstract double CalculateFees();
+
+        public int CompareTo(Flight? other)
+        {
+            if (other == null) return 1;
+            return this.ExpectedTime.CompareTo(other.ExpectedTime);
+        }
 
         public override string ToString()
         {

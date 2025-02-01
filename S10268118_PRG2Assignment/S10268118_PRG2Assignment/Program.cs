@@ -136,7 +136,9 @@ void ListAllFlights(Dictionary<string, Flight> flights, Dictionary<string, Airli
         Console.WriteLine(
             row_format,
             flight.FlightNumber,
-            flight.FlightNumber.Length >= 2 && airlines.ContainsKey(flight.FlightNumber[..2]) ? airlines[flight.FlightNumber[..2]].Name : "Unknown",
+            flight.FlightNumber.Length >= 2 && airlines.ContainsKey(flight.FlightNumber[..2])
+                ? airlines[flight.FlightNumber[..2]].Name
+                : "Unknown",
             flight.Origin,
             flight.Destination,
             flight.ExpectedTime
@@ -151,7 +153,7 @@ void AssignBoardingGate(
 {
     while (true)
     {
-        Console.WriteLine("Enter Flight Number (or \"Cancel\" to stop): ");
+        Console.WriteLine("Enter Flight Number (or \"Exit\" to stop): ");
         string assigningFlightNumber = Console.ReadLine();
 
         if (flights.TryGetValue(assigningFlightNumber, out Flight? assigningFlight))
@@ -205,11 +207,11 @@ Supports LWTT: {assigningBoardingGate.SupportsLWTT}"
                         );
                         continue;
                     }
-                    else if (assigningFlight is NORMFlight
+                    else if (
+                        assigningFlight is NORMFlight
                         || (assigningFlight is DDJBFlight && assigningBoardingGate.SupportsDDJB)
                         || (assigningFlight is CFFTFlight && assigningBoardingGate.SupportsCFFT)
                         || (assigningFlight is LWTTFlight && assigningBoardingGate.SupportsLWTT)
-
                     )
                     {
                         while (true)
@@ -255,10 +257,11 @@ Supports LWTT: {assigningBoardingGate.SupportsLWTT}"
                             }
                         }
                         assigningBoardingGate.Flight = assigningFlight;
-                        Console.WriteLine($"Flight {assigningFlightNumber} has been assigned to Boarding Gate {assigningBoardingGateName}!\n");
+                        Console.WriteLine(
+                            $"Flight {assigningFlightNumber} has been assigned to Boarding Gate {assigningBoardingGateName}!\n"
+                        );
                         break;
                     }
-
                     else
                     {
                         Console.WriteLine(
@@ -267,20 +270,27 @@ Supports LWTT: {assigningBoardingGate.SupportsLWTT}"
                         continue;
                     }
                 }
-                else if (assigningBoardingGateName.Equals("Cancel", StringComparison.CurrentCultureIgnoreCase))
+                else if (
+                    assigningBoardingGateName.Equals(
+                        "Cancel",
+                        StringComparison.CurrentCultureIgnoreCase
+                    )
+                )
                 {
                     Console.WriteLine("Cancelling...\n");
                     break;
                 }
                 else
                 {
-                    Console.WriteLine("No boarding gate with that name was found!\nPlease enter a valid name.\n");
+                    Console.WriteLine(
+                        "No boarding gate with that name was found!\nPlease enter a valid name.\n"
+                    );
                 }
             }
         }
-        else if (assigningFlightNumber.Equals("Cancel", StringComparison.CurrentCultureIgnoreCase))
+        else if (assigningFlightNumber.Equals("Exit", StringComparison.CurrentCultureIgnoreCase))
         {
-            Console.WriteLine("Cancelling...");
+            Console.WriteLine("Exiting...");
             break;
         }
         else
@@ -396,10 +406,55 @@ void CreateFlight(ref Dictionary<string, Flight> flights)
             "Would you like to add another flight? (\"N\" to stop, else will continue)"
         );
 
-        if (Console.ReadLine() == "N")
+        if (Console.ReadLine().Equals("N", StringComparison.CurrentCultureIgnoreCase))
         {
             break;
         }
+    }
+}
+
+void DisplayFlightSchedule(
+    Dictionary<string, Airline> airlines,
+    Dictionary<string, BoardingGate> boardingGates,
+    Dictionary<string, Flight> flights
+)
+{
+    List<Flight> sortedFlightList = new(flights.Values);
+    sortedFlightList.Sort();
+
+    string row_format = "{0, -16}{1, -23}{2, -23}{3, -23}{4, -36}{5, -16}{6}";
+
+    Console.WriteLine(
+        row_format,
+        "Flight Number",
+        "Airline Name",
+        "Origin",
+        "Destination",
+        "Expected Departure/Arrival Time",
+        "Status",
+        "Boarding Gate"
+    );
+
+    foreach (Flight flight in sortedFlightList)
+    {
+        string assignedBoardingGateName = boardingGates
+            .FirstOrDefault(boardingGate =>
+                boardingGate.Value.Flight?.FlightNumber == flight.FlightNumber
+            )
+            .Key;
+
+        Console.WriteLine(
+            row_format,
+            flight.FlightNumber,
+            flight.FlightNumber.Length >= 2 && airlines.ContainsKey(flight.FlightNumber[..2])
+                ? airlines[flight.FlightNumber[..2]].Name
+                : "Unknown",
+            flight.Origin,
+            flight.Destination,
+            flight.ExpectedTime,
+            flight.Status,
+            assignedBoardingGateName ?? "Unassigned"
+        );
     }
 }
 
@@ -457,7 +512,12 @@ Assign a Boarding Gate to a Flight
             //ModifyFlightDetails();
             break;
         case "7":
-            //DisplayFlightSchedule();
+            Console.WriteLine(
+                @"=============================================
+Flight Schedule for Changi Airport Terminal 5
+============================================="
+            );
+            DisplayFlightSchedule(airlines, boardingGates, flights);
             break;
         case "0":
             Console.WriteLine("Goodbye!");
